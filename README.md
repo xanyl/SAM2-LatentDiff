@@ -33,21 +33,22 @@
 | Ablation B: Random cond. | 17.87 | 0.6733 | 0.3225 |
 
 ## Architecture
-
 ```
-Low-Light Input ──→ SAM2 Encoder (frozen) ──→ SAM2 Adapter (256→768) ──┐
-       │                                                                │ cross-attention
-       └──→ VAE Encoder (frozen) ──→ Low-Light Latent (75×50×4) ──→ SD U-Net + LoRA
-                                                                        │
-                                                Enhanced Latent ←───────┘
-                                                        │
-                                                VAE Decoder (frozen)
-                                                        │
-                                                PixelRefiner (87K)
-                                                        │
-                                                  Final Output
+graph LR
+    A[Low-Light Input] --> B[SAM2 Encoder <br/><i>(frozen)</i>]
+    A --> C[VAE Encoder <br/><i>(frozen)</i>]
+    
+    B --> D[SAM2 Adapter <br/><i>(256→768)</i>]
+    C --> E[Low-Light Latent <br/><i>(75×50×4)</i>]
+    
+    D -.->|cross-attention| F
+    E --> F[SD U-Net + LoRA]
+    
+    F --> G[Enhanced Latent]
+    G --> H[VAE Decoder <br/><i>(frozen)</i>]
+    H --> I[PixelRefiner <br/><i>(87K)</i>]
+    I --> J[Final Output]
 ```
-
 ## Installation
 
 ```bash
