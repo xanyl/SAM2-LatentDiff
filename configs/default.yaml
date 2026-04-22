@@ -1,0 +1,84 @@
+# SAM2-LatentDiff Configuration
+# All hyperparameters for training and evaluation
+
+# === Model ===
+model:
+  # Stable Diffusion backbone
+  sd_model_id: "sd-legacy/stable-diffusion-v1-5"
+  
+  # LoRA configuration
+  lora_rank: 16
+  lora_alpha: 16
+  lora_dropout: 0.05
+  lora_target_modules:
+    - "to_q"
+    - "to_v"
+    - "to_k"
+    - "to_out.0"
+    - "proj_in"
+    - "proj_out"
+    - "ff.net.0.proj"
+    - "ff.net.2"
+  
+  # SAM2 Adapter
+  sam2_dim: 256
+  sd_cross_dim: 768
+  adapter_seq_len: 77
+  
+  # PixelRefiner
+  refiner_channels: 48
+
+# === Data ===
+data:
+  image_size: [400, 600]  # H, W
+  latent_size: [50, 75]   # H/8, W/8
+  vae_scale_factor: 0.18215
+
+# === Stage 1: Latent Training ===
+stage1:
+  epochs: 80
+  batch_size: 8
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-4
+  scheduler: "cosine"
+  ema_decay: 0.999
+  grad_clip: 1.0
+  mixed_precision: true
+  num_workers: 4
+  
+  # Loss weights
+  loss_l1_weight: 1.0
+  loss_l2_weight: 0.5
+
+# === Stage 2: Pixel Refinement ===
+stage2:
+  epochs: 80
+  batch_size: 4
+  learning_rate: 2.0e-4
+  weight_decay: 1.0e-4
+  scheduler: "cosine"
+  ema_decay: 0.999
+  grad_clip: 1.0
+  mixed_precision: true
+  num_workers: 2
+  
+  # Early stopping
+  patience: 12
+  
+  # Loss weights
+  loss_charbonnier_weight: 1.0
+  loss_l2_weight: 0.3
+  loss_lpips_weight: 0.1
+
+# === Evaluation ===
+eval:
+  save_images: true
+  num_vis_samples: 5
+  vis_indices: [0, 20, 40, 60, 80]
+
+# === Paths (override via CLI) ===
+paths:
+  data_dir: "data/preprocessed"
+  dataset_dir: "data"
+  checkpoint_dir: "checkpoints"
+  output_dir: "outputs"
