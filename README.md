@@ -33,9 +33,6 @@
 | Ablation B: Random cond. | 17.87 | 0.6733 | 0.3225 |
 
 ## Architecture
-### Architecture Overview
-
-### Architecture Overview
 
 ```mermaid
 graph LR
