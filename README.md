@@ -33,22 +33,42 @@
 | Ablation B: Random cond. | 17.87 | 0.6733 | 0.3225 |
 
 ## Architecture
-```
+### Architecture Overview
+
+```mermaid
 graph LR
-    A[Low-Light Input] --> B[SAM2 Encoder <br/><i>(frozen)</i>]
-    A --> C[VAE Encoder <br/><i>(frozen)</i>]
+    %% Nodes
+    In[Low-Light Input]
+    SAM[SAM2 Encoder <br/><i>(frozen)</i>]
+    VAE_E[VAE Encoder <br/><i>(frozen)</i>]
+    Adapt[SAM2 Adapter <br/><i>(256→768)</i>]
+    Latent[Low-Light Latent <br/><i>(75×50×4)</i>]
+    UNet[SD U-Net + LoRA]
+    ELatent[Enhanced Latent]
+    VAE_D[VAE Decoder <br/><i>(frozen)</i>]
+    PR[PixelRefiner <br/><i>(87K)</i>]
+    Out[Final Output]
+
+    %% Connections
+    In --> SAM
+    In --> VAE_E
+    SAM --> Adapt
+    VAE_E --> Latent
     
-    B --> D[SAM2 Adapter <br/><i>(256→768)</i>]
-    C --> E[Low-Light Latent <br/><i>(75×50×4)</i>]
+    Adapt -.->|cross-attention| UNet
+    Latent --> UNet
     
-    D -.->|cross-attention| F
-    E --> F[SD U-Net + LoRA]
-    
-    F --> G[Enhanced Latent]
-    G --> H[VAE Decoder <br/><i>(frozen)</i>]
-    H --> I[PixelRefiner <br/><i>(87K)</i>]
-    I --> J[Final Output]
+    UNet --> ELatent
+    ELatent --> VAE_D
+    VAE_D --> PR
+    PR --> Out
+
+    %% Styling
+    style SAM fill:#f9f,stroke:#333,stroke-dasharray: 5 5
+    style VAE_E fill:#f9f,stroke:#333,stroke-dasharray: 5 5
+    style VAE_D fill:#f9f,stroke:#333,stroke-dasharray: 5 5
 ```
+
 ## Installation
 
 ```bash
