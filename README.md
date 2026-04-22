@@ -35,18 +35,20 @@
 ## Architecture
 ### Architecture Overview
 
+### Architecture Overview
+
 ```mermaid
 graph LR
     %% Nodes
     In[Low-Light Input]
-    SAM[SAM2 Encoder <br/><i>(frozen)</i>]
-    VAE_E[VAE Encoder <br/><i>(frozen)</i>]
-    Adapt[SAM2 Adapter <br/><i>(256→768)</i>]
-    Latent[Low-Light Latent <br/><i>(75×50×4)</i>]
+    SAM["SAM2 Encoder <br/><i>(frozen)</i>"]
+    VAE_E["VAE Encoder <br/><i>(frozen)</i>"]
+    Adapt["SAM2 Adapter <br/><i>(256→768)</i>"]
+    Latent["Low-Light Latent <br/><i>(75×50×4)</i>"]
     UNet[SD U-Net + LoRA]
     ELatent[Enhanced Latent]
-    VAE_D[VAE Decoder <br/><i>(frozen)</i>]
-    PR[PixelRefiner <br/><i>(87K)</i>]
+    VAE_D["VAE Decoder <br/><i>(frozen)</i>"]
+    PR["PixelRefiner <br/><i>(87K)</i>"]
     Out[Final Output]
 
     %% Connections
@@ -68,6 +70,7 @@ graph LR
     style VAE_E fill:#f9f,stroke:#333,stroke-dasharray: 5 5
     style VAE_D fill:#f9f,stroke:#333,stroke-dasharray: 5 5
 ```
+
 
 ## Installation
 
