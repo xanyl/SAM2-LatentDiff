@@ -28,25 +28,46 @@
 |--------|--------|--------|---------|
 | CUGD (baseline, paper) | 21.00 | 0.8300 | 0.2000 |
 | **Ours: Latent Only** | 17.19 | 0.5758 | 0.2812 |
-| **Ours: + PixelRefiner** | **18.61** | **0.7085** | **0.2399** |
+| **Ours: + PixelRefiner** | **18.61 ± 3.18** | **0.7085 ± 0.0986** | **0.2399 ± 0.0647** |
 | Ablation A: No SAM2 | 18.08 | 0.6731 | 0.3091 |
 | Ablation B: Random cond. | 17.87 | 0.6733 | 0.3225 |
 
 ## Architecture
 
+```mermaid
+graph LR
+    %% Nodes
+    In[Low-Light Input]
+    SAM["SAM2 Encoder <br/><i>(frozen)</i>"]
+    VAE_E["VAE Encoder <br/><i>(frozen)</i>"]
+    Adapt["SAM2 Adapter <br/><i>(256→768)</i>"]
+    Latent["Low-Light Latent <br/><i>(75×50×4)</i>"]
+    UNet[SD U-Net + LoRA]
+    ELatent[Enhanced Latent]
+    VAE_D["VAE Decoder <br/><i>(frozen)</i>"]
+    PR["PixelRefiner <br/><i>(87K)</i>"]
+    Out[Final Output]
+
+    %% Connections
+    In --> SAM
+    In --> VAE_E
+    SAM --> Adapt
+    VAE_E --> Latent
+    
+    Adapt -.->|cross-attention| UNet
+    Latent --> UNet
+    
+    UNet --> ELatent
+    ELatent --> VAE_D
+    VAE_D --> PR
+    PR --> Out
+
+    %% Styling
+    style SAM fill:#f9f,stroke:#333,stroke-dasharray: 5 5
+    style VAE_E fill:#f9f,stroke:#333,stroke-dasharray: 5 5
+    style VAE_D fill:#f9f,stroke:#333,stroke-dasharray: 5 5
 ```
-Low-Light Input ──→ SAM2 Encoder (frozen) ──→ SAM2 Adapter (256→768) ──┐
-       │                                                                │ cross-attention
-       └──→ VAE Encoder (frozen) ──→ Low-Light Latent (75×50×4) ──→ SD U-Net + LoRA
-                                                                        │
-                                                Enhanced Latent ←───────┘
-                                                        │
-                                                VAE Decoder (frozen)
-                                                        │
-                                                PixelRefiner (87K)
-                                                        │
-                                                  Final Output
-```
+
 
 ## Installation
 
